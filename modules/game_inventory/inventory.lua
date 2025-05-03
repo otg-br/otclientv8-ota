@@ -225,26 +225,46 @@ function onMiniWindowClose()
   inventoryButton:setOn(false)
 end
 
--- hooked events
 function onInventoryChange(player, slot, item, oldItem)
-  if slot > InventorySlotPurse then return end
+	if InventorySlotPurse < slot then
+		return
+	end
 
-  if slot == InventorySlotPurse then
-    if g_game.getFeature(GamePurseSlot) then
-      --purseButton:setEnabled(item and true or false)
+	local rarity = false
+
+	if slot == InventorySlotPurse then
+		if g_game.getFeature(GamePurseSlot) then
+			-- Nothing
+		end
+
+		return
+	end
+
+	local itemWidget = inventoryPanel:getChildById("slot" .. slot)
+
+    if item then
+        itemWidget:setStyle("InventoryItem")
+        itemWidget:setItem(item)
+
+        local itemInfo = player:getInventoryItem(slot)
+        local rarity = itemInfo:getTooltip()
+
+        if rarity then
+            if string.find(rarity, "legendary") then
+                itemWidget:setImageSource("/images/ui/rarity_gold.png")
+            elseif string.find(rarity, "epic") then
+                itemWidget:setImageSource("/images/ui/rarity_purple.png")
+            elseif string.find(rarity, "rare") then
+                itemWidget:setImageSource("/images/ui/rarity_blue.png")
+            end
+        end
+    else
+        itemWidget:setStyle(InventorySlotStyles[slot])
+        itemWidget:setItem(nil)
+        itemWidget:setTooltip(nil)
     end
-    return
-  end
-
-  local itemWidget = inventoryPanel:getChildById('slot' .. slot)
-  if item then
-    itemWidget:setStyle('InventoryItem')
-    itemWidget:setItem(item)
-  else
-    itemWidget:setStyle(InventorySlotStyles[slot])
-    itemWidget:setItem(nil)
-  end
 end
+
 
 function onBlessingsChange(player, blessings, oldBlessings)
   local hasAdventurerBlessing = Bit.hasBit(blessings, Blessings.Adventurer)

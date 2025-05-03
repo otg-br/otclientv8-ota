@@ -1,6 +1,6 @@
 MainWindow
   id: transferWindow
-  !text: tr('Gift Tibia Coins')
+  !text: tr('Gift Miracle Coins')
   size: 280 240
   @onEscape: modules.game_shop.hideTransfer()
 
@@ -10,7 +10,7 @@ MainWindow
     anchors.right: parent.right
     text-wrap: true
     height: 56
-    !text: tr('Please select the amount of Tibia Coins you would like to gift and enter the name of the character that should receive the Tibia Coins.')
+    !text: tr('Please select the amount of Miracle Coins you would like to gift and enter the name of the character that should receive the Miracle Coins.')
 
   Label
     anchors.top: prev.bottom
@@ -32,7 +32,7 @@ MainWindow
     anchors.right: parent.right
     margin-top: 10
     text-align: center
-    !text: tr('Transferable Tibia Coins:')
+    !text: tr('Transferable Miracle Coins:')
 
   Label
     id: coinsAmountLabel
