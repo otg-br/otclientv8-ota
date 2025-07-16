@@ -35,6 +35,7 @@ UIItem::UIItem()
     m_lastDecayUpdate = 0;
     m_decayColor = Color(127, 255, 212);
     m_decayPausedColor = Color(222, 109, 109);
+    m_chargeColor = Color(255, 255, 255);
 }
 
 void UIItem::drawSelf(Fw::DrawPane drawPane)
@@ -60,9 +61,46 @@ void UIItem::drawSelf(Fw::DrawPane drawPane)
         m_item->setColor(m_itemColor);
         m_item->draw(drawRect);
 
-        if(m_font && m_showCount && (m_showCountAlways || (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1)) {
-            g_drawQueue->addText(m_font, m_countText, Rect(drawRect.topLeft(), drawRect.bottomRight() - Point(3, 0)), Fw::AlignBottomRight, m_color);
+        if (m_font && m_showCount) {
+            if (m_item->getShowCount() == 1 && m_item->getCountOrSubType() > 1) {
+                g_drawQueue->addText(m_font, m_countText, Rect(drawRect.topLeft(), drawRect.bottomRight() - Point(3, 0)), Fw::AlignBottomRight, m_color);
+				return;
+            }
+
+            if (m_item->getShowCount() == 2 && m_item->getCountOrSubType() > 1) {
+                g_drawQueue->addText(m_font, m_countText, Rect(drawRect.topLeft(), drawRect.bottomRight() - Point(3, 0)), Fw::AlignBottomRight, m_chargeColor);
+				return;
+            }
+
+            if (m_item->getShowCount() == 3 && m_item->getCountOrSubType() > 1) {
+				g_logger.traceWarning("e");
+                int totalSeconds = m_item->getCountOrSubType();
+                int days = totalSeconds / 86400;
+                int hours = (totalSeconds % 86400) / 3600;
+                int minutes = (totalSeconds % 3600) / 60;
+                int seconds = totalSeconds % 60;
+                std::string text = "";
+                if (days > 0) {
+                    text = std::to_string(days) + "d";
+                }
+                else if (hours > 0) {
+                    text = std::to_string(hours) + "h";
+                }
+                else if (minutes > 0) {
+                    text = std::to_string(minutes) + "m";
+                }
+                else {
+                    text = std::to_string(seconds) + "s";
+                }
+                g_drawQueue->addText(m_font, text, Rect(drawRect.topLeft(), drawRect.bottomRight() - Point(3, 0)), Fw::AlignBottomRight, m_decayColor);
+				return;
+            }
         }
+
+        if(m_font && m_showCount && (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
+            g_drawQueue->addText(m_font, m_countText, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), Fw::AlignBottomRight, Color(231, 231, 231));
+			return;
+		}
 
         if (m_showId) {
             g_drawQueue->addText(m_font, std::to_string(m_item->getServerId()), drawRect, Fw::AlignBottomRight, m_color);

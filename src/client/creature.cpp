@@ -273,7 +273,17 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
 
         if (m_text) {
             auto extraTextSize = m_text->getCachedText().getTextSize();
-            Rect extraTextRect = Rect(point.x + m_informationOffset.x - extraTextSize.width() / 2.0, point.y + m_informationOffset.y + 15, extraTextSize);
+
+            if (!m_marketTexture) {
+                m_marketTexture = g_textures.getTexture("/images/game/market.png");
+            }
+
+            if (m_marketTexture) {
+                Rect marketRect = Rect((point.x + m_informationOffset.x - extraTextSize.width() / 2.0)-5, (point.y + m_informationOffset.y - 45)-5, extraTextSize.width()+10, (extraTextSize.height() < 25 ? extraTextSize.height() : 25)+10);
+                g_drawQueue->addTexturedRect(marketRect, m_marketTexture, Rect(0, 0, m_marketTexture->getSize()));
+            }
+
+            Rect extraTextRect = Rect(point.x + m_informationOffset.x - extraTextSize.width() / 2.0, point.y + m_informationOffset.y - 45, extraTextSize);
             m_text->drawText(extraTextRect.center(), extraTextRect);
         }
     }

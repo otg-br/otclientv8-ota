@@ -3433,9 +3433,13 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
                 msg->getU32(); // master
 
             std::string name = g_game.formatCreatureName(msg->getString());
+            std::string marketDescription = msg->getString();
 
             if (creature) {
                 creature->setName(name);
+                if (marketDescription != "") {
+                    creature->setText(marketDescription, Color::white);
+                }
             } else {
                 if (id == m_localPlayer->getId())
                     creature = m_localPlayer;
@@ -3457,7 +3461,9 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
                 if (creature) {
                     creature->setId(id);
                     creature->setName(name);
-
+                    if (marketDescription != "") {
+                        creature->setText(marketDescription, Color::white);
+                    }
                     g_map.addCreature(creature);
                 }
             }
@@ -3590,6 +3596,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id, bool hasDescri
     if (g_game.getFeature(Otc::GameThingMarks) && !g_game.getFeature(Otc::GameTibia12Protocol)) {
         msg->getU8(); // mark
     }
+    
 
     if (item->isStackable() || item->isChargeable()) {
         item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());

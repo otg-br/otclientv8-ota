@@ -1,0 +1,10 @@
+Module
+  name: game_marketing
+  description: Mananger Marketing
+  author: ALS
+  website: https://github.com/edubart/otclient
+  sandboxed: true
+  autoload: true
+  scripts: [ game_marketing ]
+  @onLoad: init()
+  @onUnload: terminate()

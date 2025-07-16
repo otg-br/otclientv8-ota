@@ -71,6 +71,7 @@ protected:
     std::string m_decayText;
     Color m_decayColor;
     Color m_decayPausedColor;
+    Color m_chargeColor;
 };
 
 #endif

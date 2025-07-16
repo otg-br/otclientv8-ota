@@ -41,5 +41,7 @@ Module
     - game_stats
     - game_shaders
     - game_bot
+    - game_marketing
+
   @onLoad: init()
   @onUnload: terminate()

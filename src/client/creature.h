@@ -229,6 +229,7 @@ protected:
     TexturePtr m_emblemTexture;
     TexturePtr m_typeTexture;
     TexturePtr m_iconTexture;
+    TexturePtr m_marketTexture;
     stdext::boolean<true> m_showShieldTexture;
     stdext::boolean<false> m_shieldBlink;
     stdext::boolean<false> m_passable;

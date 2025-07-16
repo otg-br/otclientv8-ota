@@ -1,0 +1,322 @@
+newItem < Item
+
+MainWindow
+  id: gameMarketing
+  anchors.verticalCenter: parent.verticalCenter
+  anchors.horizontalCenter: parent.horizontalCenter
+  size: 508 500
+  text: Marketing
+  phantom: false
+  focusable: true
+  draggable: false
+
+  Button
+    id: oppenedButton
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 25 25
+    text: <-
+    @onClick: modules.game_marketing.oppenedButton(self)
+    visible: false
+
+  Button
+    id: descButton
+    anchors.top: parent.top
+    anchors.right: parent.right
+    size: 105 25
+    text: Edit Description
+    @onClick: self:getParent():getChildById('descWindow'):show()
+
+  ScrollablePanel
+    id: marketWindow
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: 35 0 180 0
+    background-color: #00000022
+
+    layout:
+      type: grid
+      cell-size: 34 34
+      flow: true
+
+  Label
+    id: itemName
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin: 27 0 0 0
+    text: Item Name
+    text-auto-resize: true
+
+  Label
+    id: itemPrice
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin: 10 0 0 0
+    text: Price (un):
+    text-auto-resize: true
+
+  TextEdit
+    id: priceWindow
+    anchors.top: prev.top
+    anchors.left: parent.left
+    margin: -1 0 0 62
+    size: 58 20
+    text: 1
+
+    @onHoverChange: if not tonumber(self:getText()) then self:setText(1) end
+
+    @onTextChange: |
+      self:getParent():getChildById('itemPrice'):setText("Price (un): "..self:getText().."")
+      if #self:getText() > 7 then self:setText(self:getText():sub(1, 7)) end
+      local unityPriceValue = tonumber(self:getText()) or 1
+      if self:getParent():getChildById('itemAmountBar') then
+        self:getParent():getChildById('itemAmountPrice'):setText("Price (total): "..unityPriceValue*self:getParent():getChildById('itemAmountBar'):getValue().."")
+      end
+
+  Label
+    id: itemAmountPrice
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin: 10 0 0 0
+    text: Price total:
+    text-auto-resize: true
+
+  HorizontalScrollBar
+    id: itemAmountBar
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin: 10 0 0 0
+    minimum: 1
+    maximum: 1
+
+    @onValueChange: |
+      self:getParent():getChildById('itemAmountCount'):setText(self:getValue())
+      local unityPriceValue = tonumber(self:getParent():getChildById('priceWindow'):getText()) or 1
+      self:getParent():getChildById('itemAmountPrice'):setText("Price (total): "..self:getValue()*unityPriceValue.."")
+
+  Label
+    id: itemAmount
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin: 10 0 0 0
+    size: 50 15
+    text: Amount:
+
+  Label
+    id: itemAmountCount
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin: 0 0 0 2
+    text: 1
+    text-auto-resize: true
+
+  Item
+    id: itemBKG
+    anchors.top: marketWindow.bottom
+    anchors.horizontalCenter: marketWindow.horizontalCenter
+    margin: 25 50 0 0
+    size: 50 50
+
+  Button
+    id: actionButton
+    anchors.top: prev.bottom
+    anchors.left: prev.horizontalCenter
+    size: 50 30
+    margin: 10 0 0 -53
+    text: Select
+
+    @onClick: modules.game_marketing.actionButton(self:getText())
+
+  Button
+    id: cancelButton
+    anchors.top: prev.top
+    anchors.left: prev.right
+    size: 50 30
+    margin: 0 0 0 9
+    text: Cancel
+    enabled: false
+
+    @onClick: modules.game_marketing.cancelButton()
+
+  ScrollablePanel
+    id: itemLook
+    anchors.top: marketWindow.bottom
+    anchors.bottom: separator.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin: 10 0 10 13
+    text-wrap: true
+    background-color: #00000066
+    vertical-scrollbar: lookScrollBar
+
+    Label
+      id: lookLabel
+      text-wrap: true
+      text-auto-resize: true
+
+    layout:
+      type: grid
+      cell-size: 209 150
+
+  VerticalScrollBar
+    id: lookScrollBar
+    anchors.top: itemLook.top
+    anchors.bottom: itemLook.bottom
+    anchors.left: itemLook.right
+    margin: 0 0 0 -11
+    pixels-scroll: true
+    step: 20
+
+  HorizontalSeparator
+    id: separator
+    anchors.top: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: -40 0 0 0
+
+  MainWindow
+    id: message
+    anchors.centerIn: parent
+    size: 300 150
+    text: Message
+    visible: false
+
+    Label
+      id: msgLabel
+      anchors.centerIn: parent
+      text-auto-resize: true
+
+    Button
+      id: okBtn
+      anchors.bottom: parent.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      text: Ok
+      @onClick: self:getParent():hide()
+
+  MainWindow
+    id: messageStart
+    anchors.centerIn: parent
+    size: 260 120
+    text: Logout Confirmation
+    visible: false
+    draggable: false
+
+    Label
+      id: msgLabelStart
+      anchors.centerIn: parent
+      size: 230 50
+      text: By clicking "Ok" you will be logged out, are you sure you want to do this?
+      text-wrap: true
+
+    Button
+      id: okBtnStart
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      margin: 0 0 0 50
+      text: Ok
+      @onClick: modules.game_marketing.startButton()
+
+    Button
+      id: cancelBtnStart
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      margin: 0 50 0 0
+      text: Cancel
+      @onClick: self:getParent():hide()
+
+  MainWindow
+    id: descWindow
+    anchors.centerIn: parent
+    size: 250 160
+    text: Market Description
+    visible: false
+    draggable: false
+    focusable: true
+
+    TextEdit
+      id: descEdit
+      anchors.centerIn: parent
+      size: 200 20
+      placeholder: Set your market description!
+
+    Button
+      id: descOK
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      margin: 0 0 0 50
+      text: Ok
+      @onClick: self:getParent():hide()
+
+    Button
+      id: descCancel
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      margin: 0 50 0 0
+      text: Cancel
+      @onClick: | 
+        self:getParent():getChildById('descEdit'):setText("")
+        self:getParent():hide()
+
+  MainWindow
+    id: buyWindow
+    anchors.centerIn: parent
+    size: 300 110
+    text: Purchase Confirmation
+    visible: false
+    draggable: false
+    focusable: true
+
+    Label
+      id: buyMsg
+      anchors.centerIn: parent
+      size: 280 35
+      text: Are you sure you want to make this purchase?
+      text-wrap: true
+
+    Button
+      id: buyOK
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      margin: 0 0 0 50
+      text: Ok
+      @onClick: modules.game_marketing.buyButton()
+
+    Button
+      id: buyCancel
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      margin: 0 50 0 0
+      text: Cancel
+      @onClick: self:getParent():hide()
+
+  ScrollablePanel
+    id: goldWindow
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    size: 85 20
+    background-color: #00000066
+
+    UIWidget
+      id: goldIMG
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.right: parent.right
+      margin: 0 5 0 0
+      image-source: img/icon_gold
+
+  Button
+    id: startButton
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 105 20
+    text: Start Market
+    @onClick: self:getParent():getChildById('messageStart'):show()
+
+  Button
+    id: closeButton
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 105 20
+    text: Close
+    @onClick: self:getParent():hide()

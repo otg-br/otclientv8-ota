@@ -577,6 +577,30 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
       end
     end
 
+    local function getDistanceBetweenRange(p1, p2)
+      return math.max(math.abs(p1.x - p2.x), math.abs(p1.y - p2.y))
+    end
+  
+    if getDistanceBetweenRange(g_game.getLocalPlayer():getPosition(), creatureThing:getPosition()) <= 1 then
+      player_market = g_game.getLocalPlayer()
+      market_area = modules.game_marketing.market_area
+      local inMarketArea = false
+      for _, area in pairs(market_area) do
+        if player_market:getPosition().x >= area["init"].x and player_market:getPosition().x <= area["end"].x
+        and player_market:getPosition().y >= area["init"].y and player_market:getPosition().y <= area["end"].y
+        and player_market:getPosition().z >= area["init"].z and player_market:getPosition().z <= area["end"].z then
+          inMarketArea = true
+          break
+        end
+      end
+      if inMarketArea then
+        if creatureThing:isMonster() or creatureThing:getId() == player_market:getId() then
+          menu:addSeparator()
+          menu:addOption(tr('Open Market'), function() modules.game_marketing.sendMarket(creatureThing:getName()) end)
+        end
+      end
+    end
+
     if modules.game_ruleviolation.hasWindowAccess() and creatureThing:isPlayer() then
       menu:addSeparator()
       menu:addOption(tr('Rule Violation'), function() modules.game_ruleviolation.show(creatureThing:getName()) end)
