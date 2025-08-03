@@ -70,7 +70,7 @@ SkillPanel < Panel
     anchors.verticalCenter: parent.verticalCenter    
     image-source: /images/game/topbar/boost
     size: 76 14
-    @onClick: modules.game_shop.show()
+    @onClick: modules.game_store.show()
     image-clip: 0 0 76 14
 
     $pressed:

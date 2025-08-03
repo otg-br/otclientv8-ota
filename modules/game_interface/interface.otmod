@@ -31,7 +31,7 @@ Module
     - game_modaldialog
     - game_unjustifiedpoints
     - game_walking
-    - game_shop
+    - game_store
     - game_itemselector
     - client_textedit
     - client_profiles
