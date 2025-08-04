@@ -189,16 +189,22 @@ function onStoreOffers(categoryName, serverOffers)
   end
 
   -- Show offers if this category is currently selected
-  local activeCategory = gameStoreWindow:getChildById("categoriesList"):getFocusedChild()
-  if activeCategory then
-    local activeCategoryName = activeCategory:getChildById("name"):getText()
-    if activeCategoryName == categoryName then
-      showOffers(categoryName)
-    end
-  else
-    -- Try to show offers anyway if we have them
-    if offers[categoryName] and #offers[categoryName] > 0 then
-      showOffers(categoryName)
+  local categoriesList = gameStoreWindow:getChildById("categoriesList")
+  if categoriesList then
+    local activeCategory = categoriesList:getFocusedChild()
+    if activeCategory then
+      local nameWidget = activeCategory:getChildById("name")
+      if nameWidget then
+        local activeCategoryName = nameWidget:getText()
+        if activeCategoryName == categoryName then
+          showOffers(categoryName)
+        end
+      end
+    else
+      -- Try to show offers anyway if we have them
+      if offers[categoryName] and #offers[categoryName] > 0 then
+        showOffers(categoryName)
+      end
     end
   end
 end
@@ -264,15 +270,25 @@ function onCoinBalance(coins, transferableCoins)
   premiumPoints = tonumber(coins)
   premiumSecondPoints = tonumber(transferableCoins)
   
-  local pointsWidget = gameStoreWindow:getChildById("balance"):getChildById("value")
-  pointsWidget:setText(comma_value(premiumPoints))
+  local balanceWidget = gameStoreWindow:getChildById("balance")
+  if balanceWidget then
+    local pointsWidget = balanceWidget:getChildById("value")
+    if pointsWidget then
+      pointsWidget:setText(comma_value(premiumPoints))
+    end
+  end
   
   local balanceSecondWidget = gameStoreWindow:getChildById("balanceSecond")
-  if premiumSecondPoints and premiumSecondPoints > 0 then
-    balanceSecondWidget:getChildById("value"):setText(comma_value(premiumSecondPoints))
-    balanceSecondWidget:show()
-  else
-    balanceSecondWidget:hide()
+  if balanceSecondWidget then
+    if premiumSecondPoints and premiumSecondPoints > 0 then
+      local valueWidget = balanceSecondWidget:getChildById("value")
+      if valueWidget then
+        valueWidget:setText(comma_value(premiumSecondPoints))
+      end
+      balanceSecondWidget:show()
+    else
+      balanceSecondWidget:hide()
+    end
   end
 end
 
@@ -298,13 +314,16 @@ function processCategories(data)
   end
 
   if not browsingHistory then
-    local firstCategory = gameStoreWindow:getChildById("categoriesList"):getChildByIndex(1)
-    if firstCategory then
-      firstCategory:focus()
-      -- Trigger selection manually
-      local button = firstCategory:getChildById("button")
-      if button then
-        select(button)
+    local categoriesList = gameStoreWindow:getChildById("categoriesList")
+    if categoriesList then
+      local firstCategory = categoriesList:getChildByIndex(1)
+      if firstCategory then
+        firstCategory:focus()
+        -- Trigger selection manually
+        local button = firstCategory:getChildById("button")
+        if button then
+          select(button)
+        end
       end
     end
   end
@@ -327,15 +346,29 @@ function clearCategories()
   CATEGORIES = {}
   clearOffers()
   
+  -- Reset selected to prevent nil reference errors
+  selected = nil
+  
   local categoriesList = gameStoreWindow:getChildById("categoriesList")
-  while categoriesList:getChildCount() > 0 do
-    local child = categoriesList:getLastChild()
-    categoriesList:destroyChildren(child)
+  if categoriesList then
+    while categoriesList:getChildCount() > 0 do
+      local child = categoriesList:getLastChild()
+      categoriesList:destroyChildren(child)
+    end
   end
 end
 
 function clearOffers()
-  local offersList = gameStoreWindow:getChildById("offers"):getChildById("offersList")
+  local offersPanel = gameStoreWindow:getChildById("offers")
+  if not offersPanel then
+    return
+  end
+  
+  local offersList = offersPanel:getChildById("offersList")
+  if not offersList then
+    return
+  end
+  
   while offersList:getChildCount() > 0 do
     local child = offersList:getLastChild()
     offersList:destroyChildren(child)
@@ -458,14 +491,16 @@ function show()
   
   -- Auto-select first category if available after data is loaded
   scheduleEvent(function()
-    local categoriesList = gameStoreWindow:getChildById("categoriesList")
-    if categoriesList and categoriesList:getChildCount() > 0 then
-      local firstCategory = categoriesList:getChildByIndex(1)
-      if firstCategory then
-        firstCategory:focus()
-        local button = firstCategory:getChildById("button")
-        if button then
-          select(button)
+    if gameStoreWindow then
+      local categoriesList = gameStoreWindow:getChildById("categoriesList")
+      if categoriesList and categoriesList:getChildCount() > 0 then
+        local firstCategory = categoriesList:getChildByIndex(1)
+        if firstCategory then
+          firstCategory:focus()
+          local button = firstCategory:getChildById("button")
+          if button then
+            select(button)
+          end
         end
       end
     end
@@ -485,8 +520,14 @@ function showHistory()
   end
   
   deselect()
-  gameStoreWindow:getChildById("offers"):hide()
-  gameStoreWindow:getChildById("history"):show()
+  local offersPanel = gameStoreWindow:getChildById("offers")
+  if offersPanel then
+    offersPanel:hide()
+  end
+  local historyPanel = gameStoreWindow:getChildById("history")
+  if historyPanel then
+    historyPanel:show()
+  end
   browsingHistory = true
   
   -- Request transaction history from server
@@ -500,8 +541,16 @@ function hideHistory()
     return
   end
   
-  gameStoreWindow:getChildById("offers"):show()
-  gameStoreWindow:getChildById("history"):hide()
+  local offersPanel = gameStoreWindow:getChildById("offers")
+  if offersPanel then
+    offersPanel:show()
+  end
+  
+  local historyPanel = gameStoreWindow:getChildById("history")
+  if historyPanel then
+    historyPanel:hide()
+  end
+  
   browsingHistory = false
 end
 
@@ -511,21 +560,46 @@ local totalPages = 1
 
 function updateHistory()
   local historyPanel = gameStoreWindow:getChildById("history")
+  if not historyPanel then
+    return
+  end
+  
   local historyList = historyPanel:getChildById("list")
+  if not historyList then
+    return
+  end
+  
   historyList:destroyChildren()
 
   local index = ((currentPage - 1) * entriesPerPage) + 1
   for i = index, math.min(#HISTORY, index + entriesPerPage - 1) do
     local widget = g_ui.createWidget("HistoryWidget", historyList)
-    widget:getChildById("date"):setText(HISTORY[i].date or "Unknown")
-    widget:getChildById("price"):setText((HISTORY[i].cost > 0 and "+" or "") .. comma_value(HISTORY[i].cost))
-    widget:getChildById("price"):setOn(HISTORY[i].cost > 0)
-    widget:getChildById("coin"):setOn(false)
+    local dateWidget = widget:getChildById("date")
+    if dateWidget then
+      dateWidget:setText(HISTORY[i].date or "Unknown")
+    end
+    
+    local priceWidget = widget:getChildById("price")
+    if priceWidget then
+      priceWidget:setText((HISTORY[i].cost > 0 and "+" or "") .. comma_value(HISTORY[i].cost))
+      priceWidget:setOn(HISTORY[i].cost > 0)
+    end
+    
+    local coinWidget = widget:getChildById("coin")
+    if coinWidget then
+      coinWidget:setOn(false)
+    end
 
-    widget:getChildById("description"):setText(HISTORY[i].title)
+    local descriptionWidget = widget:getChildById("description")
+    if descriptionWidget then
+      descriptionWidget:setText(HISTORY[i].title)
+    end
   end
 
-  historyPanel:getChildById("pageLabel"):setText("Page " .. currentPage .. "/" .. totalPages)
+  local pageLabel = historyPanel:getChildById("pageLabel")
+  if pageLabel then
+    pageLabel:setText("Page " .. currentPage .. "/" .. totalPages)
+  end
 end
 
 function prevPage()
@@ -538,8 +612,17 @@ function prevPage()
   local historyPanel = gameStoreWindow:getChildById("history")
   updateHistory()
   
-  historyPanel:getChildById("nextPageButton"):setVisible(currentPage < totalPages)
-  historyPanel:getChildById("prevPageButton"):setVisible(currentPage > 1)
+  if historyPanel then
+    local nextPageButton = historyPanel:getChildById("nextPageButton")
+    if nextPageButton then
+      nextPageButton:setVisible(currentPage < totalPages)
+    end
+    
+    local prevPageButton = historyPanel:getChildById("prevPageButton")
+    if prevPageButton then
+      prevPageButton:setVisible(currentPage > 1)
+    end
+  end
 end
 
 function nextPage()
@@ -552,8 +635,17 @@ function nextPage()
   local historyPanel = gameStoreWindow:getChildById("history")
   updateHistory()
 
-  historyPanel:getChildById("nextPageButton"):setVisible(currentPage < totalPages)
-  historyPanel:getChildById("prevPageButton"):setVisible(currentPage > 1)
+  if historyPanel then
+    local nextPageButton = historyPanel:getChildById("nextPageButton")
+    if nextPageButton then
+      nextPageButton:setVisible(currentPage < totalPages)
+    end
+    
+    local prevPageButton = historyPanel:getChildById("prevPageButton")
+    if prevPageButton then
+      prevPageButton:setVisible(currentPage > 1)
+    end
+  end
 end
 
 function deselect()
@@ -566,11 +658,21 @@ function deselect()
 
     if not selected:getChildById("subCategories") then
       selected = selected:getParent():getParent()
-      selected:getChildById("expandArrow"):show()
+      if selected then
+        local expandArrow = selected:getChildById("expandArrow")
+        if expandArrow then
+          expandArrow:show()
+        end
+      end
     end
 
-    selected:setHeight(22)
-    selected:getChildById("subCategories"):hide()
+    if selected then
+      selected:setHeight(22)
+      local subCategories = selected:getChildById("subCategories")
+      if subCategories then
+        subCategories:hide()
+      end
+    end
   end
 end
 
@@ -623,6 +725,10 @@ function select(self, ignoreSearch)
   end
 
   local selfParent = self:getParent()
+  if not selfParent then
+    return
+  end
+  
   local panel = selfParent:getChildById("subCategories")
   if panel then
     deselect()
@@ -631,14 +737,26 @@ function select(self, ignoreSearch)
     if panel:getChildCount() > 0 then
       panel:show()
       selfParent:setHeight((panel:getChildCount() + 1) * 22)
-      selfParent:getChildById("expandArrow"):hide()
-      select(panel:getChildren()[1]:getChildById("button"))
+      local expandArrow = selfParent:getChildById("expandArrow")
+      if expandArrow then
+        expandArrow:hide()
+      end
+      local firstChild = panel:getChildren()[1]
+      if firstChild then
+        local button = firstChild:getChildById("button")
+        if button then
+          select(button)
+        end
+      end
     else
       self:setChecked(true)
     end
   else
     if selected then
-      selected:getChildById("button"):setChecked(false)
+      local button = selected:getChildById("button")
+      if button then
+        button:setChecked(false)
+      end
 
       local arrow = selected:getChildById("selectArrow")
       if arrow then
@@ -649,10 +767,18 @@ function select(self, ignoreSearch)
     selected = selfParent
 
     self:setChecked(true)
-    selfParent:getChildById("selectArrow"):show()
+    local selectArrow = selfParent:getChildById("selectArrow")
+    if selectArrow then
+      selectArrow:show()
+    end
   end
 
-  local categoryName = selfParent:getChildById("name"):getText()
+  local nameWidget = selfParent:getChildById("name")
+  if not nameWidget then
+    return
+  end
+  
+  local categoryName = nameWidget:getText()
   
   showOffers(categoryName)
   
