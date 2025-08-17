@@ -1,7 +1,21 @@
 OptionPanel
+  Label
+    text-wrap: false
+    @onSetup: |
+      self:setText(tr("GPU: ") .. g_graphics.getRenderer())      
+
+  Label
+    text-wrap: false
+    @onSetup: |
+      self:setText(tr("Version: ") .. g_graphics.getVersion())      
+
+  HorizontalSeparator
+    id: separator
+    margin: 5 5 5 5
+
   OptionCheckBox
     id: vsync
-    !text: tr('VSync')
+    !text: tr('Enable vertical synchronization')
     !tooltip: tr('Limits FPS (usually to 60)')
 
   OptionCheckBox
@@ -21,6 +35,10 @@ OptionPanel
     id: antialiasing
     !text: tr('Antialiasing')
 
+  OptionCheckBox
+    id: floorShadow
+    !text: tr('Floor Shadow')
+
   Label
     margin-top: 12
     id: optimizationLevelLabel
@@ -31,7 +49,7 @@ OptionPanel
     margin-top: 3
     margin-right: 2
     margin-left: 2
-    @onOptionChange: modules.client_options.presetOption(self, self:getId(), self.currentIndex)
+    @onOptionChange: modules.client_options.setOption(self:getId(), self.currentIndex)
     @onSetup: |
       self:addOption("Automatic")
       self:addOption("None")
@@ -77,9 +95,10 @@ OptionPanel
   
   Label
     id: tips
+    margin-top: 20
     text-auto-resize: true
     text-align: left
     text-wrap: true
-    !text: tr("If you have FPS issues:\n- Use OpenGL version (_gl)\n- Disable vertical synchronization\n- Set higher optimization level\n- Lower screen resolution")
+    !text: tr("If you have FPS issues:\n- Use OpenGL version (_gl)\n- Disable vertical synchronization\n- Set higher optimization level\n- Lower screen resolution\nOr report it on forum: http://otclient.net")
     $mobile:
       visible: false

@@ -1,81 +1,48 @@
-OptionContainer < FlatPanel
-  height: 22
-  padding: 3
+OptionCheckBox < CheckBox
+  @onCheckChange: modules.client_options.setOption(self:getId(), self:isChecked())
+  height: 16
 
-OptionCheckBox < OptionContainer
-  @onTextChange: addEvent(function() self.checkBox:setText(self:getText()) self:setText("", true) end)
-  @onCheckChange: addEvent(function() if self:isChecked() ~= self.checkBox:isChecked() then self.checkBox:setChecked(self:isChecked()) end end)
-  
-  CheckBox
-    id: checkBox
-    anchors.left: parent.left
-    anchors.verticalCenter: parent.verticalCenter
-    text-horizontal-auto-resize: true
-    color: #c0c0c0
-    @onCheckChange: self:getParent():setChecked(self:isChecked()) modules.client_options.presetOption(self, self:getParent():getId(), self:isChecked())
-
-OptionSimpleCheckBox < CheckBox
-  text-horizontal-auto-resize: true
-  font: verdana-11px-monochrome
-  color: #c0c0c0
-  @onCheckChange: modules.client_options.presetOption(self, self:getId(), self:isChecked())
+  $!first:
+    margin-top: 2
 
 OptionScrollbar < HorizontalScrollBar
   step: 1
-  @onValueChange: modules.client_options.presetOption(self, self:getId(), self:getValue())
-
+  @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+  
 OptionPanel < Panel
   layout:
     type: verticalBox
-    spacing: 5
-
+    
 MainWindow
   id: optionsWindow
   !text: tr('Options')
-  size: 685 530
+  size: 490 500
   $mobile:
-    size: 685 530
+    size: 490 360
 
   @onEnter: modules.client_options.hide()
   @onEscape: modules.client_options.hide()
 
-  OptionsTabBarVertical
+  TabBarVertical
     id: optionsTabBar
     anchors.top: parent.top
     anchors.left: parent.left
-    height: 440
+    anchors.bottom: parent.bottom
 
-  OptionsTabContent
-  
-  HorizontalSeparator
-    id: separator
-    anchors.top: optionsTabContent.bottom
-    anchors.left: parent.left
+  Panel
+    id: optionsTabContent
+    anchors.top: optionsTabBar.top
+    anchors.left: optionsTabBar.right
     anchors.right: parent.right
-    margin-top: 12
+    anchors.bottom: optionsTabBar.bottom
+    margin-left: 10
+    margin-top: 3
 
-  SmallButton
-    !text: tr('Cancel')
-    anchors.top: separator.bottom
-    anchors.right: parent.right
-    width: 45
-    margin-top: 12
-    @onClick: modules.client_options.cancelButton()
-
-  SmallButton
-    !text: tr('Apply')
-    anchors.top: separator.bottom
-    anchors.right: prev.left
-    width: 45
-    margin-top: 12
-    margin-right: 5
-    @onClick: modules.client_options.applyButton()
-
-  SmallButton
+  Button
     !text: tr('Ok')
-    anchors.top: separator.bottom
-    anchors.right: prev.left
-    width: 45
-    margin-top: 12
-    margin-right: 5
-    @onClick: modules.client_options.okButton()
+    width: 64
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    @onClick: |
+      g_settings.save()
+      modules.client_options.hide()
