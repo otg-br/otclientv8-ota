@@ -944,8 +944,45 @@ function addTabText(text, speaktype, tab, creatureName)
     label = g_ui.createWidget('ConsoleLabel', consoleBuffer)
   end
   label:setId('consoleLabel' .. consoleBuffer:getChildCount())
-  label:setText(text)
-  label:setColor(speaktype.color)
+  
+  -- Detecta mensagens de loot e formata as cores
+  local isLootMessage = (text:find('^Loot of ') or text:find('^%d%d:%d%d Loot of ')) and text:find('%[#%x%x%x%x%x%x%]')
+  
+  if isLootMessage then
+    -- Formata corretamente para setColoredText (array de strings alternando texto e cor)
+    local formattedParts = {}
+    local remainingText = text
+    
+    while #remainingText > 0 do
+      local startPos, endPos, hex, innerText = remainingText:find("%[%#(%x%x%x%x%x%x)%](.-)%[/#%]")
+      
+      if startPos then
+        -- Adiciona texto antes da tag de cor (se houver)
+        if startPos > 1 then
+          local beforeText = remainingText:sub(1, startPos - 1)
+          table.insert(formattedParts, beforeText)
+          table.insert(formattedParts, speaktype.color) -- usa a cor padrão
+        end
+        
+        -- Adiciona o texto colorido
+        table.insert(formattedParts, innerText)
+        table.insert(formattedParts, "#" .. hex)
+        
+        remainingText = remainingText:sub(endPos + 1)
+      else
+        -- Texto restante sem tags de cor
+        table.insert(formattedParts, remainingText)
+        table.insert(formattedParts, speaktype.color)
+        break
+      end
+    end
+    
+    label:setColoredText(formattedParts)
+  else
+    label:setText(text)
+    label:setColor(speaktype.color)
+  end
+  
   consoleTabBar:blinkTab(tab)
 
   if speaktype.npcChat and (g_game.getCharacterName() ~= creatureName or g_game.getCharacterName() == 'Account Manager') then

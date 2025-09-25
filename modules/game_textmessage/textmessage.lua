@@ -80,21 +80,29 @@ function displayMessage(mode, text)
   if not g_game.isOnline() then return end
 
   local msgtype = MessageTypes[mode]
-  if not msgtype then
+  if not msgtype or msgtype == MessageSettings.none then
     return
   end
 
-  if msgtype == MessageSettings.none then return end
-
-  if msgtype.consoleTab ~= nil and (msgtype.consoleOption == nil or modules.client_options.getOption(msgtype.consoleOption)) then
-    modules.game_console.addText(text, msgtype, tr(msgtype.consoleTab))
-    --TODO move to game_console
+  -- Console
+  if mode ~= MessageModes.Loot and msgtype.consoleTab ~= nil and
+     (msgtype.consoleOption == nil or modules.client_options.getOption(msgtype.consoleOption)) then
+     modules.game_console.addText(text, msgtype, tr(msgtype.consoleTab))
   end
 
+  -- Popup
   if msgtype.screenTarget then
     local label = messagesPanel:recursiveGetChildById(msgtype.screenTarget)
-    label:setText(text)
-    label:setColor(msgtype.color)
+
+    if msgtype == MessageSettings.loot then
+        label:setText(text)
+        label:setColor(msgtype.color)
+    else
+        local plainMessage = text:gsub("%[%#%x%x%x%x%x%x%](.-)%[/#%]", "%1")
+        label:setText(plainMessage)
+        label:setColor(msgtype.color)
+    end
+    
     label:setVisible(true)
     removeEvent(label.hideEvent)
     label.hideEvent = scheduleEvent(function() label:setVisible(false) end, calculateVisibleTime(text))
