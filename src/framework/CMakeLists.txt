@@ -106,6 +106,11 @@ set(framework_SOURCES ${framework_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/core/scheduledevent.h
     ${CMAKE_CURRENT_LIST_DIR}/core/timer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/timer.h
+    # voice system
+    ${CMAKE_CURRENT_LIST_DIR}/voice/voicemanager.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/voice/voicemanager.h
+    ${CMAKE_CURRENT_LIST_DIR}/voice/luafunctions_voice.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/voice/luafunctions_voice.h
 
     # luaengine
     ${CMAKE_CURRENT_LIST_DIR}/luaengine/declarations.h
@@ -231,7 +236,7 @@ add_definitions(-D"WITH_ENCRYPTION")
 # main libs
 if(NOT WASM)
     # find boost
-    set(REQUIRED_BOOST_COMPONENTS system filesystem)
+    set(REQUIRED_BOOST_COMPONENTS serialization system filesystem)
     set(Boost_USE_MULTITHREADED ON)
     set(Boost_USE_STATIC_LIBS ${USE_STATIC_LIBS})
     find_package(Boost 1.67.0 COMPONENTS ${REQUIRED_BOOST_COMPONENTS} REQUIRED)
@@ -258,6 +263,17 @@ if(NOT WASM)
     find_package(PhysFS REQUIRED)
     find_package(OpenSSL REQUIRED)
     find_package(ZLIB REQUIRED)
+    
+    # find opus for voice system
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(OPUS REQUIRED opus)
+    
+    # find portaudio for voice system
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(PORTAUDIO REQUIRED portaudio-2.0)
+    
+    # find openal for voice system
+    find_package(OpenAL REQUIRED)
 
     set(framework_LIBRARIES ${framework_LIBRARIES}
         ${Boost_LIBRARIES}
@@ -268,6 +284,9 @@ if(NOT WASM)
         ${LIBZIP_LIBRARY}
 	${ZLIB_LIBRARY}
 	${BZIP2_LIBRARIES}
+	${OPUS_LIBRARIES}
+	${PORTAUDIO_LIBRARIES}
+	${OPENAL_LIBRARY}
     )
 
     if(WIN32)
@@ -284,6 +303,9 @@ if(NOT WASM)
         ${LIBZIP_INCLUDE_DIR_ZIPCONF}
 	${ZLIB_INCLUDE_DIR}
 	${BZIP2_INCLUDE_DIR}
+	${OPUS_INCLUDE_DIRS}
+	${PORTAUDIO_INCLUDE_DIRS}
+	${OPENAL_INCLUDE_DIR}
     )
 endif()
 
@@ -433,7 +455,7 @@ if(FRAMEWORK_GRAPHICS)
         ${CMAKE_CURRENT_LIST_DIR}/graphics/shader.h
         ${CMAKE_CURRENT_LIST_DIR}/graphics/shaderprogram.cpp
         ${CMAKE_CURRENT_LIST_DIR}/graphics/shaderprogram.h
-	${CMAKE_CURRENT_LIST_DIR}/graphics/shadermanager.cpp
+	    ${CMAKE_CURRENT_LIST_DIR}/graphics/shadermanager.cpp
         ${CMAKE_CURRENT_LIST_DIR}/graphics/shadermanager.h
         ${CMAKE_CURRENT_LIST_DIR}/graphics/textrender.cpp
         ${CMAKE_CURRENT_LIST_DIR}/graphics/textrender.h

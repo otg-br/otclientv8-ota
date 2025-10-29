@@ -1,0 +1,217 @@
+MainWindow
+  id: voiceWindow
+  !text: tr('Voice Chat')
+  size: 380 420
+  @onEscape: self:hide()
+
+  Panel
+    id: voicePanel
+    anchors.fill: parent
+    margin: 5
+
+    Label
+      id: titleLabel
+      !text: tr('Voice Chat Manager')
+      font: verdana-11px-rounded
+      text-align: center
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 25
+
+    Panel
+      id: statusPanel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 10
+      height: 60
+
+      Label
+        id: statusLabel
+        !text: tr('Status: Disconnected')
+        font: verdana-11px-rounded
+        anchors.top: parent.top
+        width: 420
+        anchors.left: parent.left
+
+      Label
+        id: roomLabel
+        !text: tr('Room: None')
+        font: verdana-11px-rounded
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        margin-top: 5
+        width: 420
+
+
+    Panel
+      id: channelPanel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 10
+      height: 95
+
+      Label
+        id: channelTitleLabel
+        !text: tr('Voice Channels')
+        font: verdana-11px-rounded
+        text-align: center
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 22
+
+      Button
+        id: worldChannelButton
+        !text: tr('World')
+        anchors.top: prev.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        margin-top: 8
+        margin-left: -80
+        width: 75
+        height: 28
+        @onClick: modules.game_voice.joinPublicVoiceRoom()
+
+      Button
+        id: partyChannelButton
+        !text: tr('Party')
+        anchors.top: prev.top
+        anchors.left: prev.right
+        margin-left: 8
+        width: 75
+        height: 28
+        @onClick: modules.game_voice.joinPartyVoiceRoom()
+
+      Button
+        id: guildChannelButton
+        !text: tr('Guild')
+        anchors.top: prev.top
+        anchors.left: prev.right
+        margin-left: 8
+        width: 75
+        height: 28
+        @onClick: modules.game_voice.joinGuildVoiceRoom()
+
+      Label
+        id: privateRoomLabel
+        !text: tr('Private Room Name:')
+        font: verdana-11px-rounded
+        anchors.top: worldChannelButton.bottom
+        anchors.left: parent.left
+        margin-top: 10
+        height: 18
+
+      TextEdit
+        id: roomNameEdit
+        anchors.top: prev.top
+        anchors.left: prev.right
+        anchors.right: parent.right
+        margin-left: 5
+        height: 20
+        phantom: false
+
+    Panel
+      id: roomPanel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 10
+      height: 90
+
+      Label
+        id: passwordLabel
+        !text: tr('Password (optional):')
+        font: verdana-11px-rounded
+        anchors.top: parent.top
+        anchors.left: parent.left
+        height: 18
+
+      TextEdit
+        id: passwordEdit
+        anchors.top: prev.top
+        anchors.left: prev.right
+        anchors.right: parent.right
+        margin-left: 5
+        height: 20
+        phantom: false
+
+      Button
+        id: createPrivateButton
+        !text: tr('Create Private')
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        margin-top: 8
+        width: 110
+        height: 28
+        @onClick: modules.game_voice.createPrivateRoom()
+
+      Button
+        id: joinPrivateButton
+        !text: tr('Join Private')
+        anchors.top: prev.top
+        anchors.left: prev.right
+        margin-left: 5
+        width: 105
+        height: 28
+        @onClick: modules.game_voice.joinPrivateRoom()
+
+      Button
+        id: roomListButton
+        !text: tr('Room List')
+        anchors.top: prev.top
+        anchors.left: prev.right
+        anchors.right: parent.right
+        margin-left: 5
+        height: 28
+        @onClick: modules.game_voice.showRoomList()
+
+    Panel
+      id: controlPanel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 10
+      height: 60
+
+      Label
+        id: controlTitleLabel
+        !text: tr('Voice Controls')
+        font: verdana-11px-rounded
+        text-align: center
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 22
+
+      Button
+        id: muteButton
+        !text: tr('Mute')
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        margin-top: 5
+        width: 95
+        height: 28
+        @onClick: modules.game_voice.toggleMute()
+
+      Button
+        id: leaveButton
+        !text: tr('Leave Room')
+        anchors.top: prev.top
+        anchors.left: prev.right
+        anchors.right: next.left
+        margin-left: 5
+        height: 28
+        width: 155
+        @onClick: modules.game_voice.leaveRoom()
+
+    Button
+      id: closeButton
+      !text: tr('Close')
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      width: 80
+      height: 28
+      margin-bottom: 5
+      @onClick: self:getParent():getParent():hide()

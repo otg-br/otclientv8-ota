@@ -1,0 +1,67 @@
+MainWindow
+  id: roomListWindow
+  !text: tr('Available Voice Rooms')
+  size: 400 300
+  @onEscape: self:hide()
+
+  Panel
+    id: listPanel
+    anchors.fill: parent
+    margin: 5
+
+    Label
+      id: listTitleLabel
+      !text: tr('Private Voice Rooms')
+      font: cipsoftFont
+      text-align: center
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 20
+
+    TextList
+      id: roomList
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: refreshButton.top
+      margin-top: 5
+      margin-bottom: 5
+      vertical-scrollbar: roomListScrollBar
+
+    VerticalScrollBar
+      id: roomListScrollBar
+      anchors.top: roomList.top
+      anchors.bottom: roomList.bottom
+      anchors.right: parent.right
+      step: 14
+      pixels-scroll: true
+
+    Button
+      id: refreshButton
+      !text: tr('Refresh')
+      anchors.bottom: joinButton.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 5
+      height: 25
+      @onClick: modules.game_voice.getAvailableRooms()
+
+    Button
+      id: joinButton
+      !text: tr('Join Selected')
+      anchors.bottom: closeButton.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 5
+      height: 25
+      @onClick: modules.game_voice.joinSelectedRoom()
+
+    Button
+      id: closeButton
+      !text: tr('Close')
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      width: 80
+      height: 25
+      @onClick: self:getParent():getParent():hide()

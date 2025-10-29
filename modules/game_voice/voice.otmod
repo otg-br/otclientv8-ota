@@ -1,0 +1,10 @@
+Module
+  name: game_voice
+  description: Voice chat system with OTUI interface
+  author: TibiaSucks
+  website: https://tibiasucks.com
+  sandboxed: true
+  autoload: true
+  scripts: [ voice ]
+  @onLoad: init()
+  @onUnload: terminate()
