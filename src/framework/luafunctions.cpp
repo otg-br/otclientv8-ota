@@ -35,6 +35,7 @@
 #include <framework/stdext/net.h>
 #include <framework/platform/platform.h>
 #include <framework/util/stats.h>
+#include <framework/voice/luafunctions_voice.h>
 #include <regex>
 
 #ifdef FW_SOUND
@@ -961,4 +962,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<SoundChannel>("isEnabled", &SoundChannel::isEnabled);
     g_lua.bindClassMemberFunction<SoundChannel>("getId", &SoundChannel::getId);
 #endif
+
+    // Register voice functions
+    Voice_registerFunctions();
 }
