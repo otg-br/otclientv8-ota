@@ -1,0 +1,67 @@
+StoreFlatPanel < UIWidget
+  phantom: true
+  auto-focus: first
+  image-source: panel
+  image-border: 3
+
+StoreLightFlatPanel < UIWidget
+  phantom: true
+  auto-focus: first
+  image-source: panel_container
+  image-border: 3
+
+StoreButton < UIButton
+  font: verdana-11px-antialised
+  color: #dfdfdfff
+  size: 106 23
+  text-offset: 0 0
+  image-source: button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+
+  $hover !disabled:
+    image-clip: 0 23 22 23
+
+  $pressed:
+    image-clip: 0 46 22 23
+    text-offset: 1 1
+
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+
+StoreWindow < UIWindow
+  anchors.centerIn: parent
+  font: verdana-11px-antialised
+  size: 200 200
+  opacity: 1
+  color: #dfdfdf
+  text-offset: 0 6
+  text-align: top
+  image-source: window
+  image-border: 6
+  image-border-top: 27
+  padding-top: 36
+  padding-left: 16
+  padding-right: 16
+  padding-bottom: 16
+
+  $disabled:
+    color: #dfdfdf88
+
+  $dragging:
+    opacity: 0.8
+
+StoreFlatLabel < UILabel
+  font: verdana-11px-antialised
+  color: #dfdfdf
+  size: 86 20
+  text-offset: 3 3
+  image-source: panel_flat
+  image-border: 1
+
+  $disabled:
+    color: #dfdfdf88
