@@ -83,7 +83,8 @@ MenuCategoryStore < UIWidget
   text-offset: 25 0
   text-wrap: true
   icon-align: left
-  icon-offset: 6 0
+  icon-offset: 6 4
+  icon-size: 13 13
 
   $pressed:
     text-offset: 25 0
